@@ -1,0 +1,39 @@
+{
+  "name": "infinite/system",
+  "description": "Infinite System",
+  "keywords": ["infinite", "system"],
+  "license": "MIT",
+  "homepage": "https://infinitesystems.com",
+  "support": {
+    "issues": "https://github.com/realized-one/system/issues",
+    "source": "https://github.com/realized-one/system"
+  },
+  "authors": [
+    {
+      "name": "Evgeny Kalashnikov",
+      "email": "ekalashnikov@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.3|^8.0"
+  },
+  "replace": {
+    "system/options": "self.version"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.5.8|^9.3.3"
+  },
+  "provide": {
+    "psr/container-implementation": "1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "System\\": "src/System/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
