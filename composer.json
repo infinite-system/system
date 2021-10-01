@@ -1,12 +1,12 @@
 {
-  "name": "realized-one/system",
+  "name": "infinite-system/system",
   "description": "Infinite System",
   "keywords": ["infinite", "system"],
   "license": "MIT",
-  "homepage": "https://infinitesystems.com",
+  "homepage": "https://infinitesystem.one",
   "support": {
-    "issues": "https://github.com/realized-one/system/issues",
-    "source": "https://github.com/realized-one/system"
+    "issues": "https://github.com/infinite-system/system/issues",
+    "source": "https://github.com/infinite-system/system"
   },
   "authors": [
     {

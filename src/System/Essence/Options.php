@@ -29,7 +29,7 @@ class Options
 	protected static $specialKeys = ["+" => "+", "-" => "-", "^" => "^", "~" => "~", "*" => "*"];
 
 	/**
-	 * initialize options
+	 * Initialize options
 	 *
 	 * @param $defaults
 	 * @param $opts
@@ -40,7 +40,7 @@ class Options
 	{
 		if (empty($opts)) return $defaults;
 
-		$newOpts = $defaults;//new \ArrayObject($defaults, \ArrayObject::STD_PROP_LIST);
+		$newOpts = $defaults;
 
 		foreach ($opts as $key => $value) {
 
@@ -77,7 +77,7 @@ class Options
 	}
 
 	/**
-	 * special method for appending and modifying options.
+	 * Special method for appending and modifying options.
 	 * based on first letter of the option.
 	 *
 	 * @param $alter
@@ -161,60 +161,7 @@ class Options
 	}
 
 	/**
-	 * Resolve dot notation for array.
-	 *
-	 * 'settings.settingOne' will resolve to ['settings']['settingOne'].
-	 *
-	 * @param $ref
-	 * @param $option
-	 * @param null $setValue
-	 * @param bool $setNull
-	 * @param bool $asReference
-	 * @return mixed|null
-	 */
-	public static function resolveDotNotation(&$ref, $option, $setValue = null, $setNull = false, $asReference = false)
-	{
-		if (isset($ref[$option])) return $setValue !== null ? $ref[$option] = $setValue : $ref[$option];
-
-		static $memory;
-		if (is_null($memory)) $memory = [];
-
-		$partsString = '';
-		if (isset($memory[$option])) {
-			$partsString = $memory[$option];
-		} else {
-			$inc = 0;
-			$dotInc = 0;
-			$part = '';
-			while (isset($option[$inc])) {
-				$isDot = $option[$inc] === '.';
-				$is0 = $option[$inc] === "*";
-				$part .= $isDot ? '' : $option[$inc];
-				if ($isDot) {
-					$dotInc++;
-					$partsString .= ($part[0] === "*" ? '' . "\0" . '*' . "\0" . $part : $part) . '"]["';
-					$part = '';
-				}
-				$inc++;
-			}
-			if ($part !== '') {
-				$partsString .= $part;
-			}
-			$memory[$option] = $partsString;
-		}
-
-		$asReferenceSymbol = $asReference ? '&' : '';
-		if ($setValue !== null || $setNull) {
-			$evalString = 'return $ref["' . $partsString . '"] = ' . $asReferenceSymbol . '$setValue;';
-		} else {
-			$evalString = 'return isset($ref["' . $partsString . '"]) ? $ref["' . $partsString . '"] : null;';
-		}
-
-		return eval($evalString);
-	}
-
-	/**
-	 * init shortcut options.
+	 * Init shortcut options.
 	 *
 	 * @param $defaults
 	 * @param $opts
@@ -228,7 +175,6 @@ class Options
 		if (is_null($memory)) $memory = [];
 
 		if (empty($opts)) return $defaults;
-
 
 		$createDefaults = true;
 		$defaultsWithMap = ['__map' => []];
@@ -312,7 +258,7 @@ class Options
 	}
 
 	/**
-	 * resolve dot notation for array.
+	 * Resolve dot notation for array.
 	 *
 	 * 'settings.settingOne' will resolve to ['settings']['settingOne'].
 	 *
@@ -326,6 +272,7 @@ class Options
 	{
 		$nonExistent = false;
 		$refRef = &$ref;
+
 		foreach (explode('.', $option) as $segment) {
 			if (isset($refRef[$segment])) {
 				$refRef = &$refRef[$segment];
@@ -351,104 +298,7 @@ class Options
 	}
 
 	/**
-	 * resolve dot notation for array.
-	 *
-	 * 'settings.settingOne' will resolve to ['settings']['settingOne'].
-	 *
-	 * @param $ref
-	 * @param $option
-	 * @param null $setValue
-	 * @param string $varName
-	 * @return mixed|null
-	 */
-	public static function &__dot(&$ref, $option)
-	{
-		$nonExistent = false;
-		$refRef = &$ref;
-		foreach (explode('.', $option) as $segment) {
-			if (isset($refRef[$segment])) {
-				$refRef = &$refRef[$segment];
-			} else {
-				$nonExistent = true;
-				break;
-			}
-		}
-
-		$null = null;
-		if ($nonExistent) return $null;
-
-		return $refRef;
-	}
-
-	/**
-	 * resolve dot notation for array.
-	 *
-	 * 'settings.settingOne' will resolve to ['settings']['settingOne'].
-	 *
-	 * @param $ref
-	 * @param $option
-	 * @param null $setValue
-	 * @param string $varName
-	 * @return mixed|null
-	 */
-	public static function &dotSet(&$ref, $option, $setValue)
-	{
-		$refRef = &self::__dot($ref, $option);
-		$refRef = $setValue;
-
-		return $refRef;
-	}
-
-	/**
-	 * overwrite options.
-	 *
-	 * @param $defaults
-	 * @param $opts
-	 * @return mixed
-	 */
-	public static function overwrite($defaults, $opts)
-	{
-		if (empty($opts)) return $defaults;
-
-		foreach ($opts as $key => $value) {
-			$alter = '';
-			$newKey = '';
-			$doAlter = false;
-			$keyPointer = $key;
-
-			if (isset(self::$specialKeys[$key[0]])) {
-				$alter = $key[0];
-				$doAlter = true;
-				$keyInc = 1; // offset by 1 character
-
-				while (isset($key[$keyInc])) {
-					$newKey .= $key[$keyInc];
-					++$keyInc;
-				}
-				$keyPointer = $newKey;
-			}
-
-			if (is_array($value)) {
-				$defaultsVar = isset($defaults[$keyPointer])
-				&& is_array($defaults[$keyPointer])
-					? $defaults[$keyPointer]
-					: [];
-
-				$defaults[$keyPointer] = self::overwrite($defaultsVar, $value);
-			} else {
-				if ($doAlter) {
-					self::alterOption($alter, $defaults, $keyPointer, $value);
-				} else {
-					$defaults[$keyPointer] = $value;
-				}
-			}
-		}
-
-		return $defaults;
-	}
-
-	/**
-	 * create javaScript options from PHP array.
+	 * Create JavaScript options from PHP array.
 	 *
 	 * @param $defaults
 	 * @param $options
@@ -545,14 +395,16 @@ class Options
 	public static function buildShortcuts($defaults = [], $options = [])
 	{
 		$optionsArray = [];
+
 		foreach ($options as $key => $value) {
-			if ($options[$key] != $defaults[$key]) $optionsArray[self::buildShortcutLowercase($key)] = $value;
+			if ($value != $defaults[$key]) $optionsArray[self::buildShortcutLowercase($key)] = $value;
 		}
+
 		return $optionsArray;
 	}
 
 	/**
-	 * build shortcut by first capital letter.
+	 * Build shortcut by first capital letter.
 	 * 'ajaxOptions' will become 'ao'.
 	 * 'settings' will become 's'.
 	 * 'appendToConsole' will become 'atc'.
@@ -577,28 +429,5 @@ class Options
 		return $shortHandLower;
 	}
 
-	/**
-	 * replace options.
-	 *
-	 * @param $newOpts
-	 * @param $defaults
-	 * @param $opts
-	 * @param $subOptions
-	 * @param string $method
-	 */
-	private static function replaceOptions(&$newOpts, $replace)
-	{
-		if (is_array($replace) && !empty($replace)) {
-			foreach ($replace as $key => $rep) {
-				foreach ($rep as $name => $replaceWith) {
-					$value = self::dot($newOpts, $key);
-					$setValue = is_array($value)
-						? $replaceWith
-						: str_replace($name, $replaceWith, $value);
 
-					self::dot($newOpts, $key, $setValue, true);
-				}
-			}
-		}
-	}
 }
