@@ -25,12 +25,22 @@
   },
 
   "autoload": {
+    "files": ["scripts/"],
     "psr-4": {
       "System\\": "src/System/"
     }
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "optimize-autoloader": true
+  },
+  "script": {
+    "pre-package-install": [
+      "ComposerEventListener::prePackageInstall"
+    ],
+    "post-package-install": [
+      "ComposerEventListener::prePackageInstall"
+    ]
   },
   "minimum-stability": "dev",
   "prefer-stable": true
