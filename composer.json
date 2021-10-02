@@ -25,7 +25,7 @@
   },
 
   "autoload": {
-    "files": ["scripts/"],
+    "classmap": ["scripts/"],
     "psr-4": {
       "System\\": "src/System/"
     }
@@ -34,12 +34,12 @@
     "sort-packages": true,
     "optimize-autoloader": true
   },
-  "script": {
+  "scripts": {
     "pre-package-install": [
       "ComposerEventListener::prePackageInstall"
     ],
     "post-package-install": [
-      "ComposerEventListener::prePackageInstall"
+      "ComposerEventListener::postPackageInstall"
     ]
   },
   "minimum-stability": "dev",
